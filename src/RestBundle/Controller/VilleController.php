@@ -2,15 +2,53 @@
 
 namespace RestBundle\Controller;
 
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\FOSRestController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response as Reponse;
 
-class openWheatherController extends FOSRestController
+class VilleController extends FOSRestController
 {
-    public function getMeteoAction($ville)
+
+    /**
+     * @Get("/villes/{ville}/{action}")
+     */
+    public function getVilleAction($ville,$action)
     {
+
+        if($action == "meteo")
+        {
+            $data["meto"] = $this->creeMeteo($ville);
+        }
+        elseif($action == "resto")
+        {
+
+        }
+        elseif($action == "cine")
+        {
+
+        }
+        else
+        {
+            $action = "all";
+            /**
+             * Cas all
+             */
+            $data["meto"] = $this->creeMeteo($ville);
+        }
+         $data["request"] = array("ville" => $ville, "action"=> $action, "date" => new \DateTime('now'));
+
+        $view = $this->view($data, 200)
+            ->setTemplate("MyBundle:Villes:getVilles.html.twig")
+            ->setTemplateVar('villes')
+        ;
+        return $this->handleView($view);
+    }
+
+    public function creeMeteo( $ville)
+    {
+
         $url = "api.openweathermap.org/data/2.5/weather?q=".$ville.",fr&appid=19bb68549e82c17cc5a2acff46bc2999";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -31,13 +69,9 @@ class openWheatherController extends FOSRestController
                 }
             }
         }
-        $data = array($ville => array("temp" => $temp));
-        $view = $this->view($data, 200)
-            ->setTemplate("AppBundle:Meteo:getMeteo.html.twig")
-            ->setTemplateVar('meteos')
-        ;
 
-        return $this->handleView($view);
+        $retour = array('temp' => $temp) ;
+        return $retour;
     }
 
     public function redirectAction()
@@ -47,6 +81,4 @@ class openWheatherController extends FOSRestController
 
         return $this->handleView($view);
     }
-
-
 }
