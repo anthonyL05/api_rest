@@ -19,15 +19,15 @@ class VilleController extends FOSRestController
 
         if($action == "meteo")
         {
-            $data["meto"] = $this->creeMeteo($ville);
+            $data["meteo"] = $this->creeMeteo($ville);
         }
         elseif($action == "resto")
         {
-
+            $data['resto'] = $this->creeResto($ville);
         }
         elseif($action == "cine")
         {
-
+            $data['cine'] = $this->creeCine($ville);
         }
         else
         {
@@ -35,7 +35,9 @@ class VilleController extends FOSRestController
             /**
              * Cas all
              */
-            $data["meto"] = $this->creeMeteo($ville);
+            $data["meteo"] = $this->creeMeteo($ville);
+            $data['resto'] = $this->creeResto($ville);
+            $data['cine'] = $this->creeCine($ville);
         }
          $data["request"] = array("ville" => $ville, "action"=> $action, "date" => new \DateTime('now'));
 
@@ -46,9 +48,8 @@ class VilleController extends FOSRestController
         return $this->handleView($view);
     }
 
-    public function creeMeteo( $ville)
+    public function creeMeteo($ville)
     {
-
         $url = "api.openweathermap.org/data/2.5/weather?q=".$ville.",fr&appid=19bb68549e82c17cc5a2acff46bc2999";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -73,7 +74,14 @@ class VilleController extends FOSRestController
         $retour = array('temp' => $temp) ;
         return $retour;
     }
-
+    public function creeResto($ville)
+    {
+        return array("nom" => "test");
+    }
+    public function creeCine($ville)
+    {
+        return array("cine" => "app");
+    }
     public function redirectAction()
     {
         $view = $this->redirectView($this->generateUrl('some_route'), 301);
